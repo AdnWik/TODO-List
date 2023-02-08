@@ -6,11 +6,8 @@ from peewee import *
 dataBaseName = 'todo'+'.db'
 
 # TODO:
-"""
-if os.path.exists(dataBaseName):
-    os.remove(dataBaseName)
-"""
-# if not os.path.exists(dataBaseName):
+
+
 db = SqliteDatabase(dataBaseName)  # ':memory:'
 
 
@@ -40,6 +37,13 @@ def initialization_data():
     db.close()
 
 
+def reset_database():
+    if os.path.exists(dataBaseName):
+        os.remove(dataBaseName)
+    SqliteDatabase(dataBaseName)
+    initialization_data()
+
+
 def create_task():
     print('Create new task')
     taskName = input('Eneter task name -> ')
@@ -53,26 +57,54 @@ def create_task():
 def show_all_task():
     db.connect()
     response = Task.select(Task, TaskState).join(TaskState)
-    print('='*50)
-    print(f'You have {len(response)} tasks:')
+    print('='*82)
+    print(f'You have {len(response)} tasks:\n')
     for task in response:
         print(
-            f"Id: {task.id:<5} Task: {task.task:<50} State: {task.state.state:<8}")
+            f"Id: {task.id:<3} | Task: {task.task:<30} | State: {task.state.state:<8}")
     db.close()
-    print('='*50)
+    print('='*82)
 
 # TODO:
 
 
 def update_task():
+    print('U'*82)
     print('Enter task ID to update:')
     taskIdToUpdate = int(input('--> '))
     db.connect()
     task = Task.select().where(Task.id == taskIdToUpdate).get()
-    print(task.state.state)
-    task.state = TaskState.select().where(TaskState.state == 'Done').get()
+    print('\nSelected task:')
+    print(
+        f'Task id: {task.id:<3} | Task name: {task.task:<30} | Task status: {task.state.state:<8}')
+
+    print('\nWhat do you want to change ?')
+    print('1 - Task name\n2 - Task status\n3 - Dead line')
+    choiceUpdate = int(input('-> '))
+    if choiceUpdate == 1:
+        print('Eneter new task name')
+        updateName = input('->')
+        task.task = updateName
+        print(f'Task name changed to: {updateName}')
+
+    if choiceUpdate == 2:
+        print('\nChose new state')
+        response = TaskState.select()
+        for state in response:
+            print(f'{state.id} -> {state.state}')
+        choseState = int(input('-> '))
+        for _ in response:
+            if _.id == choseState:
+                print(_.state)
+                task.state = TaskState.select().where(TaskState.state == _.state).get()
+                print(f'Status changed to: {_.state}')
+
+    if choiceUpdate == 3:
+        pass
+
     task.save()
     db.close()
+    print('U'*82)
 
 
 def delete_task():
@@ -83,7 +115,6 @@ def delete_task():
     db.close()
 
 
-initialization_data()
 print('\nThis is test message')
 while True:
 
@@ -104,3 +135,6 @@ while True:
 
     if choice == 4:
         delete_task()
+
+    if choice == 919:
+        reset_database()
