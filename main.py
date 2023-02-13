@@ -71,7 +71,7 @@ def show_all_task():
 def update_task():
     print('U'*82)
     print('Enter task ID to update:')
-    taskIdToUpdate = int(input('--> '))
+    taskIdToUpdate = int(input('-> '))
     db.connect()
     task = Task.select().where(Task.id == taskIdToUpdate).get()
     print('\nSelected task:')
@@ -109,7 +109,7 @@ def update_task():
 
 def delete_task():
     print('Enter task ID to delete:')
-    taskIdToDelete = int(input('--> '))
+    taskIdToDelete = int(input('-> '))
     db.connect()
     Task.select().where(Task.id == taskIdToDelete).get().delete_instance()
     db.close()
